@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>DB Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body class="bg-gray-800 text-white font-mono h-screen overflow-hidden">
+
+<!-- ===================== NAV ===================== -->
+<nav class="grid grid-cols-4 p-4 font-bold text-green-500">
+    <div>Host: {{ db_info.HOST }}</div>
+    <div>Port: {{ db_info.PORT }}</div>
+    <div>DB: {{ db_info.NAME }}</div>
+    <div>User: {{ db_info.USER }}</div>
+</nav>
+
+<!-- ===================== MAIN LAYOUT ===================== -->
+<div class="flex h-[calc(100vh-64px)] px-4 gap-4">
+
+<!-- ===================== SIDEBAR TABLES ===================== -->
+<div class="w-1/6 bg-white text-violet-950 h-fit rounded p-3
+            sticky top-0  overflow-y-auto">
+    <h2 class="font-bold mb-3">Tables</h2>
+    <ul>
+        {% for table in tables %}
+        <li class="mb-1">
+            <a href="{% url 'show_table' table %}"
+               class="block px-2 py-1 rounded
+               {% if table == selected_table %}
+                    bg-green-500 text-white
+               {% else %}
+                    hover:bg-slate-700 hover:text-white
+               {% endif %}">
+                {{ table }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- ===================== CONTENT ===================== -->
+<div class="flex-1 flex flex-col bg-gray-100 text-slate-900 rounded p-3">
+
+{% if selected_table %}
+
+<!-- ===================== HEADER FIXE ===================== -->
+<div class="flex items-center justify-between mb-3 sticky top-0 bg-gray-100 z-20">
+    <h2 class="font-bold uppercase">Table : {{ selected_table }}</h2>
+
+    <div class="flex gap-2">
+        
+    <button onclick="toggleFilters()"
+            class="bg-green-600 px-4 py-1 rounded text-white font-bold">
+        Filtres
+    </button>
+
+    <a href="{% url 'export_table' selected_table 'csv' %}"
+       class="bg-blue-600 px-4 py-1 rounded text-white font-bold">
+        CSV
+    </a>
+    <a href="{% url 'train_model' %}"
+       class="bg-yellow-600 px-4 py-1 rounded text-white font-bold">
+        Train IA
+    </a>
+
+    <a href="{% url 'export_table' selected_table 'json' %}"
+       class="bg-purple-600 px-4 py-1 rounded text-white font-bold">
+        JSON
+    </a>
+</div>
+
+
+    
+</div>
+
+<!-- ===================== FILTRES (STICKY) ===================== -->
+<div id="filters-panel"
+     class="hidden mb-3 bg-blue-100 rounded p-3 sticky top-10 z-20">
+
+<form method="get" class="space-y-4">
+
+<div>
+    <label>MAX ROWS :</label>
+    <input type="number" name="limit" value="{{ limit }}"
+           class="rounded border px-2 w-24 ml-2">
+</div>
+
+<div>
+    <h3 class="font-bold  bg-slate-950 text-white px-3 w-fit text-center rounded">COLUMNS</h3>
+    <div class="flex flex-wrap px-5 py-3 gap-3 uppercase">
+        {% for col in columns %}
+        <label>
+            <input type="checkbox" name="cols" value="{{ col }}"
+                   {% if col in selected_columns %}checked{% endif %}>
+            {{ col }}
+        </label>
+        {% endfor %}
+    </div>
+</div>
+
+<div>
+    <h3 class="font-bold bg-slate-950 text-white px-3 w-fit rounded uppercase">Filtres numériques</h3>
+    {% for col in numeric_columns %}
+    <div class="flex px-5 py-2 gap-3 uppercase">
+        <span class="w-32">{{ col }}</span>
+        <input type="number" name="{{ col }}_min" placeholder="MIN"
+               class="px-2 w-24 border rounded">
+        <input type="number" name="{{ col }}_max" placeholder="MAX"
+               class="px-2 w-24 border rounded">
+    </div>
+    {% endfor %}
+</div>
+
+<div>
+    <h3 class="font-bold bg-slate-950 w-fit text-white px-3 rounded">FILTRES CATEGORIES</h3>
+    <div class="flex flex-col py-3 gap-2">
+        {% for col, values in category_values.items %}
+        <select name="{{ col }}" class="rounded uppercase  px-2">
+            <option value="">{{ col }}</option>
+            {% for v in values %}
+            <option value="{{ v }}">{{ v }}</option>
+            {% endfor %}
+        </select>
+        {% endfor %}
+    </div>
+</div>
+
+<button onclick="closeFilters()"
+        class="bg-blue-600 px-4 py-1 rounded text-white">
+    Appliquer
+</button>
+
+</form>
+</div>
+
+<!-- ===================== TABLE SCROLLABLE ===================== -->
+<div class="flex-1 overflow-y-auto rounded bg-white uppercase">
+
+<table class=" w-full text-sm">
+    <thead class="sticky top-0 z-10">
+        <tr>
+            {% for col in selected_columns %}
+            <th class="border px-2 py-1 bg-gray-800 text-white">
+                {{ col }}
+            </th>
+            {% endfor %}
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for row in data %}
+        <tr>
+            {% for cell in row %}
+            <td class=" px-2 py-1 bg-blue-100 text-black">
+                {{ cell }}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</div>
+
+{% endif %}
+</div>
+</div>
+
+<!-- ===================== JS ===================== -->
+<script>
+function toggleFilters() {
+    document.getElementById('filters-panel').classList.toggle('hidden');
+}
+
+function closeFilters() {
+    document.getElementById('filters-panel').classList.add('hidden');
+}
+</script>
+
+</body>
+</html>

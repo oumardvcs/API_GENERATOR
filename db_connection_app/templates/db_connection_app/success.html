@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Succès</title>
+</head>
+<body>
+    <h1>✅ Succès !</h1>
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+
+    <a href="{% url 'show_tables' %}">Voir les tables</a>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <title>Connector</title>
+</head>
+<body class="bg-slate-950 flex items-center justify-center  flex-col gap-5 text-white min-h-screen font-mono">    
+
+    <h1 class="text-green-600 text-2xl p-2  sm:p-0" >Welcome to API_GEN, Connect your database to generate an API ! </h1>
+    <h2 class="text-green-600">@Ba Oumar, Physics Engineer </h2>
+    <div class=" w-11/12 sm:w-1/3 bg-slate-950 p-10 text-green-400 rounded border-white border">
+        <form method="post" action="{% url 'connect_db' %}"  class="grid grid-cols-1 sm:grid-cols-2  gap-3 ">
+            <div class="hidden">
+                {% csrf_token %}
+
+            </div>
+
+            <span cla> Type : </span>
+            <select name="type" class="bg-white text-black px-2 py-1 rounded">
+                <option value="postgresql">PostgreSQL</option>
+                <option value="mysql">MySQL</option>
+                <option value="sqlite">SQLite</option>
+            </select>
+            <span> Host: </span>
+             <input name="host" class=" bg-white text-black  px-2 py-1 rounded">
+            <span> Port : </span>
+             <input name="port" class=" bg-white text-black  px-2 py-1 rounded" type="number">
+            <span> DB name: </span>
+             <input name="db_name" class=" bg-white text-black  px-2 py-1 rounded">
+            <span> User : </span>
+             <input name="user" class=" bg-white text-black  px-2 py-1 rounded">
+            <span> Password : </span>
+            <input name="password" class=" bg-white text-black  px-2 py-1 rounded" type="password">
+
+            
+
+                    <button class=" col-span-2 rounded text-black bg-green-600 py-3 mt-2 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-green-500 ...">
+                    Connect
+                    </button>
+            
+            
+
+        </form>
+        <div>
+            {% if success %}
+            <p class="text-green-500">{{ message }}</p>
+            {% endif %}
+            {% if error %}
+            <p class="text-red-500">{{ error }}</p>
+            {% endif %}
+
+
+        </div>
+    </div>
+    
+</body>
+</html>
